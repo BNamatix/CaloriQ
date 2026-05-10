@@ -446,13 +446,13 @@ if calculate:
     days_to_goal = 0
     months_to_goal = 0
 
-    if kg_gap == 0:
-        timeline_text = "אתה כבר נמצא בטווח היעד ולכן אין צורך בחישוב זמן הגעה."
+    if kg_gap < 1:
+        timeline_text = "אתה כבר נמצא קרוב מאוד למשקל היעד ולכן אין צורך בשינוי משמעותי."
     else:
         days_to_goal = total_calorie_gap / daily_change
         months_to_goal = days_to_goal / 30
 
-        if goal == "ירידה במשקל":
+        if difference < 0:
             timeline_text = (
                 f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
                 f"{total_calorie_gap:,.0f} קלוריות. "
@@ -460,7 +460,8 @@ if calculate:
                 f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
                 f"(בערך {months_to_goal:.1f} חודשים)."
             )
-        elif goal == "עלייה במשקל":
+
+        elif difference > 0:
             timeline_text = (
                 f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
                 f"{total_calorie_gap:,.0f} קלוריות. "
@@ -468,6 +469,7 @@ if calculate:
                 f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
                 f"(בערך {months_to_goal:.1f} חודשים)."
             )
+
         else:
             timeline_text = "אתה כבר נמצא בטווח היעד ולכן אין צורך בחישוב זמן הגעה."
 
