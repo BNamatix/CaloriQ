@@ -17,12 +17,41 @@ html, body, .stApp {
 
 .block-container {
     max-width: 1150px;
-    padding-top: 2rem;
+    padding-top: 4rem;
 }
 
 h1, h2, h3, p, label, span, div {
     direction: rtl !important;
     text-align: right !important;
+}
+
+
+
+.app-header,
+.app-header div {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+.app-title {
+    font-size: 56px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+}
+
+.app-tagline {
+    font-size: 26px;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin-top: 8px;
+}
+
+.app-credit {
+    font-size: 18px;
+    color: #22c55e;
+    font-weight: 700;
+    margin-top: 8px;
 }
 
 .main-title {
@@ -332,13 +361,17 @@ def recommended_calorie_change(tdee, goal):
     return 0
 
 
-st.markdown('<div class="main-title">CaloriQ</div>', unsafe_allow_html=True)
-st.markdown('<div class="app-slogan">.Track Smart. Live Better</div>', unsafe_allow_html=True)
+header_logo, header_text = st.columns([1.4, 5])
 
-st.markdown(
-    '<div style="text-align:center;font-size:18px;color:#22c55e;font-weight:700;margin-top:2px;margin-bottom:10px;position:relative;left:-200px;">Created by BNamatix</div>',
-    unsafe_allow_html=True
-)
+with header_logo:
+    st.image("logo.png", width=110)
+
+with header_text:
+    st.markdown("""<div class="app-header">
+<div class="app-title">CaloriQ</div>
+<div class="app-tagline">Track Smart. Live Better.</div>
+<div class="app-credit">Created by BNamatix</div>
+</div>""", unsafe_allow_html=True)
 
 st.markdown(
     '<div class="subtitle">הכנס נתונים וקבל המלצה לפי BMI, BMR ורמת פעילות</div>',
