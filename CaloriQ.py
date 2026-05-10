@@ -37,6 +37,7 @@ h1, h2, h3, p, label, span, div {
     color: #cbd5e1;
     margin-bottom: 30px;
 }
+
 .app-slogan {
     text-align: center !important;
     font-size: 24px;
@@ -45,6 +46,7 @@ h1, h2, h3, p, label, span, div {
     margin-top: -8px;
     margin-bottom: 6px;
 }
+
 .stButton > button {
     width: 100%;
     height: 38px;
@@ -318,15 +320,20 @@ def bmi_marker_position(bmi):
     return max(0, min(100, pos))
 
 
-st.markdown(
-    '<div class="main-title">CaloriQ</div>',
-    unsafe_allow_html=True
-)
+def recommended_calorie_change(tdee, goal):
+    if goal == "ירידה במשקל":
+        change = tdee * 0.15
+        return max(250, min(change, 600))
 
-st.markdown(
-    '<div class="app-slogan">.Track Smart. Live Better</div>',
-    unsafe_allow_html=True
-)
+    if goal == "עלייה במשקל":
+        change = tdee * 0.10
+        return max(200, min(change, 400))
+
+    return 0
+
+
+st.markdown('<div class="main-title">CaloriQ</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-slogan">.Track Smart. Live Better</div>', unsafe_allow_html=True)
 
 st.markdown(
     '<div style="text-align:center;font-size:18px;color:#22c55e;font-weight:700;margin-top:2px;margin-bottom:10px;position:relative;left:-200px;">Created by BNamatix</div>',
@@ -352,13 +359,6 @@ with st.container(border=True):
             "רמת פעילות",
             ["ללא פעילות", "פעילות קלה", "פעילות בינונית", "פעילות גבוהה", "פעילות גבוהה מאוד"]
         )
-        daily_change = st.number_input(
-            "כמות קלוריות בנוסף לTDEE?",
-            min_value=0,
-            max_value=1500,
-            value=300,
-            step=50
-        )
 
     calculate = st.button("חשב המלצה")
 
@@ -374,26 +374,41 @@ if calculate:
 
     recommended_bmi = 22
     target_weight = recommended_bmi * ((height / 100) ** 2)
+    difference = target_weight - weight
 
-    if bmi >= 25:
-        goal = "ירידה במשקל"
-        calories = tdee - 500
-        plan_type = "גירעון קלורי מתון"
-        weekly_change = "ירידה משוערת של 0.4–0.6 ק״ג בשבוע"
+    kg_gap = abs(difference)
+    calories_per_kg = 7700
+    total_calorie_gap = kg_gap * calories_per_kg
 
-    elif bmi < 18.5:
+    if difference > 1:
         goal = "עלייה במשקל"
-        calories = tdee + 300
         plan_type = "עודף קלורי מתון"
-        weekly_change = "עלייה הדרגתית ובריאה"
+        calorie_change = recommended_calorie_change(tdee, goal)
+        calories = tdee + calorie_change
+        weekly_change = f"עלייה הדרגתית עם עודף של כ־{calorie_change:.0f} קלוריות ביום"
+
+    elif difference < -1:
+        goal = "ירידה במשקל"
+        plan_type = "גירעון קלורי מתון"
+        calorie_change = recommended_calorie_change(tdee, goal)
+        calories = tdee - calorie_change
+        weekly_change = f"ירידה הדרגתית עם גירעון של כ־{calorie_change:.0f} קלוריות ביום"
 
     else:
         goal = "שמירה על המשקל"
-        calories = tdee
         plan_type = "מאזן קלורי ניטרלי"
+        calorie_change = 0
+        calories = tdee
         weekly_change = "שמירה על המשקל הקיים"
 
     calories = max(calories, 1200)
+
+    days_to_goal = 0
+    months_to_goal = 0
+
+    if calorie_change > 0:
+        days_to_goal = total_calorie_gap / calorie_change
+        months_to_goal = days_to_goal / 30
 
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown("<h2>תוצאות</h2>", unsafe_allow_html=True)
@@ -411,7 +426,7 @@ if calculate:
     )
 
     c3.markdown(
-        f'<div class="card"><div class="card-title">TDEE</div><div class="card-value">{tdee:.0f}</div><div class="badge">הוצאה יומית</div></div>',
+        f'<div class="card"><div class="card-title">TDEE</div><div class="card-value">{tdee:.0f}</div><div class="badge">הוצאה יומית משוערת</div></div>',
         unsafe_allow_html=True
     )
 
@@ -435,58 +450,48 @@ if calculate:
     st.markdown(
         f'<div class="recommend">'
         f'<b>מטרה מומלצת:</b> {goal}<br>'
-        f'<b>טווח משקל תקין בין :</b> {min_weight:.1f} - {max_weight:.1f} ק״ג<br>'
+        f'<b>טווח משקל תקין:</b> {min_weight:.1f} - {max_weight:.1f} ק״ג<br>'
         f'<b>משקל יעד מומלץ:</b> {target_weight:.1f} ק״ג<br>'
+        f'<b>הוצאה יומית משוערת:</b> {tdee:.0f} קלוריות<br>'
         f'<b>צריכת קלוריות יומית מומלצת:</b> {calories:.0f} קלוריות<br>'
-        f'<b>סוג התוכנית:</b> {plan_type}'
+        f'<b>סוג התוכנית:</b> {plan_type}<br>'
+        f'<b>שינוי קלורי יומי מומלץ:</b> {calorie_change:.0f} קלוריות'
         f'</div>',
         unsafe_allow_html=True
     )
 
-    difference = target_weight - weight
-
-    if difference < 0:
-        goal_message = f"עליך לרדת בערך {abs(difference):.1f} ק״ג כדי להגיע ליעד המחושב."
-    elif difference > 0:
+    if difference > 1:
         goal_message = f"עליך לעלות בערך {difference:.1f} ק״ג כדי להגיע ליעד המחושב."
+    elif difference < -1:
+        goal_message = f"עליך לרדת בערך {abs(difference):.1f} ק״ג כדי להגיע ליעד המחושב."
     else:
-        goal_message = "אתה כבר נמצא בטווח היעד המחושב."
+        goal_message = "אתה כבר נמצא קרוב מאוד למשקל היעד המחושב."
 
     st.markdown(f'<div class="goal">{goal_message}</div>', unsafe_allow_html=True)
 
-    kg_gap = abs(difference)
-    calories_per_kg = 7500
-    total_calorie_gap = kg_gap * calories_per_kg
-
-    days_to_goal = 0
-    months_to_goal = 0
-
     if kg_gap < 1:
         timeline_text = "אתה כבר נמצא קרוב מאוד למשקל היעד ולכן אין צורך בשינוי משמעותי."
+
+    elif difference > 1:
+        timeline_text = (
+            f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
+            f"{total_calorie_gap:,.0f} קלוריות. "
+            f"בעודף יומי מומלץ של כ־{calorie_change:.0f} קלוריות מעל TDEE, "
+            f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
+            f"(בערך {months_to_goal:.1f} חודשים)."
+        )
+
+    elif difference < -1:
+        timeline_text = (
+            f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
+            f"{total_calorie_gap:,.0f} קלוריות. "
+            f"בגירעון יומי מומלץ של כ־{calorie_change:.0f} קלוריות מתחת ל־TDEE, "
+            f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
+            f"(בערך {months_to_goal:.1f} חודשים)."
+        )
+
     else:
-        days_to_goal = total_calorie_gap / daily_change
-        months_to_goal = days_to_goal / 30
-
-        if difference < 0:
-            timeline_text = (
-                f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
-                f"{total_calorie_gap:,.0f} קלוריות. "
-                f"בגירעון יומי של כ־{daily_change} קלוריות, "
-                f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
-                f"(בערך {months_to_goal:.1f} חודשים)."
-            )
-
-        elif difference > 0:
-            timeline_text = (
-                f"פער של {kg_gap:.1f} ק״ג מהיעד שווה בערך "
-                f"{total_calorie_gap:,.0f} קלוריות. "
-                f"בעודף יומי של כ־{daily_change} קלוריות, "
-                f"הגעה ליעד צפויה בתוך כ־{days_to_goal:.0f} ימים "
-                f"(בערך {months_to_goal:.1f} חודשים)."
-            )
-
-        else:
-            timeline_text = "אתה כבר נמצא בטווח היעד ולכן אין צורך בחישוב זמן הגעה."
+        timeline_text = "אתה כבר נמצא בטווח היעד ולכן אין צורך בחישוב זמן הגעה."
 
     st.markdown(f'<div class="timeline">{timeline_text}</div>', unsafe_allow_html=True)
 
