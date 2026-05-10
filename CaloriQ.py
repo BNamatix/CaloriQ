@@ -311,8 +311,17 @@ def bmi_marker_position(bmi):
     return max(0, min(100, pos))
 
 
-st.markdown('<div class="main-title">.CaloriQ - Track Smart. Live Better</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">הכנס נתונים וקבל המלצה לפי BMI, BMR ורמת פעילות</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">CaloriQ - Track Smart. Live Better.</div>', unsafe_allow_html=True)
+
+st.markdown(
+    '<div style="text-align:center;font-size:18px;color:#22c55e;font-weight:700;margin-top:-10px;margin-bottom:10px;">Created by BNamatix</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<div class="subtitle">הכנס נתונים וקבל המלצה לפי BMI, BMR ורמת פעילות</div>',
+    unsafe_allow_html=True
+)
 
 with st.container(border=True):
     col1, col2 = st.columns(2)
