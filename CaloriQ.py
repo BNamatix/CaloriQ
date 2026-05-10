@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="BMI & BMR Calculator",
+    page_title="CaloriQ",
     page_icon="💪",
     layout="wide"
 )
@@ -37,7 +37,14 @@ h1, h2, h3, p, label, span, div {
     color: #cbd5e1;
     margin-bottom: 30px;
 }
-
+.app-slogan {
+    text-align: center !important;
+    font-size: 24px;
+    font-weight: 800;
+    color: #e5e7eb;
+    margin-top: -8px;
+    margin-bottom: 6px;
+}
 .stButton > button {
     width: 100%;
     height: 38px;
@@ -311,10 +318,18 @@ def bmi_marker_position(bmi):
     return max(0, min(100, pos))
 
 
-st.markdown('<div class="main-title">.CaloriQ - Track Smart. Live Better</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-title">CaloriQ</div>',
+    unsafe_allow_html=True
+)
 
 st.markdown(
-    '<div style="text-align:center;font-size:18px;color:#22c55e;font-weight:700;margin-top:-10px;margin-bottom:10px;">Created by BNamatix</div>',
+    '<div class="app-slogan">.Track Smart. Live Better</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<div style="text-align:center;font-size:18px;color:#22c55e;font-weight:700;margin-top:2px;margin-bottom:10px;position:relative;left:-200px;">Created by BNamatix</div>',
     unsafe_allow_html=True
 )
 
@@ -338,8 +353,8 @@ with st.container(border=True):
             ["ללא פעילות", "פעילות קלה", "פעילות בינונית", "פעילות גבוהה", "פעילות גבוהה מאוד"]
         )
         daily_change = st.number_input(
-            "כמה קלוריות ביום לדעתך תוכל לשמור כפער?",
-            min_value=100,
+            "כמות קלוריות בנוסף לTDEE?",
+            min_value=0,
             max_value=1500,
             value=300,
             step=50
