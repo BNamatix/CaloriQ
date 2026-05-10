@@ -357,21 +357,23 @@ if calculate:
     style, badge = bmi_style(category)
     marker = bmi_marker_position(bmi)
 
+    recommended_bmi = 22
+    target_weight = recommended_bmi * ((height / 100) ** 2)
+
     if bmi >= 25:
         goal = "ירידה במשקל"
-        target_weight = max_weight
         calories = tdee - 500
         plan_type = "גירעון קלורי מתון"
         weekly_change = "ירידה משוערת של 0.4–0.6 ק״ג בשבוע"
+
     elif bmi < 18.5:
         goal = "עלייה במשקל"
-        target_weight = min_weight
         calories = tdee + 300
         plan_type = "עודף קלורי מתון"
         weekly_change = "עלייה הדרגתית ובריאה"
+
     else:
         goal = "שמירה על המשקל"
-        target_weight = weight
         calories = tdee
         plan_type = "מאזן קלורי ניטרלי"
         weekly_change = "שמירה על המשקל הקיים"
